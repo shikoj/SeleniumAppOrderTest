@@ -41,8 +41,7 @@ public class AppOrderTest {
     }
 
     @Test
-
-    public void PositiveOrderTest() {
+    public void positiveOrderTest() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
@@ -53,23 +52,45 @@ public class AppOrderTest {
         assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", result.getText().trim());
     }
 
-        @Test
+    @Test
+    public void positiveOrderTestNameWithSpace() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий Филипов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
 
-        public void NegativeOrderTestNullName() {
+        WebElement result = driver.findElement(By.cssSelector("[data-test-id='order-success']"));
+        assertTrue(result.isDisplayed());
+        assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", result.getText().trim());
+    }
 
-            driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
-            driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
-            driver.findElement(By.tagName("button")).click();
+    @Test
+    public void positiveOrderTestNameWithHyphenatedName() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий-Филипов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
 
-            WebElement error = driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub"));
-            assertTrue(error.isDisplayed());
+        WebElement result = driver.findElement(By.cssSelector("[data-test-id='order-success']"));
+        assertTrue(result.isDisplayed());
+        assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", result.getText().trim());
+    }
 
+    @Test
+    public void negativeOrderTestNullName() {
+
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Поле обязательно для заполнения", error.getText().trim());
 
     }
 
     @Test
-
-    public void NegativeOrderTestNullPhone() {
+    public void negativeOrderTestNullPhone() {
 
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
@@ -77,12 +98,26 @@ public class AppOrderTest {
 
         WebElement error = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub"));
         assertTrue(error.isDisplayed());
+        assertEquals("Поле обязательно для заполнения", error.getText().trim());
 
     }
 
     @Test
+    public void negativeOrderTestNullCheckBox() {
 
-    public void NegativeOrderTestNoValidName() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='agreement'].input_invalid .checkbox__text"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Я соглашаюсь с условиями обработки и использования моих персональных данных и разрешаю сделать запрос в бюро кредитных историй", error.getText().trim());
+
+    }
+
+
+    @Test
+    public void negativeOrderTestNoValidNameLatinSymbols() {
 
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Vasiliy");
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
@@ -95,6 +130,91 @@ public class AppOrderTest {
 
     }
 
+    @Test
+    public void negativeOrderTestNoValidNameWithNumber() {
+
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий 1");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79851591831");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", error.getText().trim());
+
+    }
+
+
+    @Test
+    public void negativeOrderTestNoValidPhoneWhithoutPlus() {
+
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("79851591831");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", error.getText().trim());
+
+    }
+
+    @Test
+    public void negativeOrderTestNoValidPhone10Symbols() {
+
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+7985159183");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", error.getText().trim());
+
+    }
+
+    @Test
+    public void negativeOrderTestNoValidPhone12Symbols() {
+
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+798515918311");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", error.getText().trim());
+
+    }
+
+
+    @Test
+    public void negativeOrderTestNoValidPhoneLetters() {
+
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+bbbbbbbbbbb");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", error.getText().trim());
+
+    }
+
+    @Test
+    public void negativeOrderTestNoValidPhoneSpecialSymbol() {
+
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Василий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("!79012345678");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.tagName("button")).click();
+
+        WebElement error = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub"));
+        assertTrue(error.isDisplayed());
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", error.getText().trim());
+
+    }
 
 
 }
